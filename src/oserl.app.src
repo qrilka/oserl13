@@ -1,0 +1,13 @@
+%% -*- erlang -*-
+{application, oserl,
+  [
+    {description, "Short Message Peer to Peer Protocol implementation." },
+    {vsn, "1.3" },
+    {modules, []},
+%    {registered, [biz_srv]},
+    {applications, [kernel, stdlib]},
+    {mod, {biz_app,[]}},
+%    {start_phases, [{go,[]}]},
+    {env, []}
+  ]
+}.
