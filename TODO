@@ -1,0 +1,32 @@
+TODO - OSERL Version 1.2                                     Apr 11, 2005
+
+                    http://sourceforge.net/projects/oserl/
+
+             Enrique Marcote Peña <mpquique@users.sourceforge.net>
+
+
+Contents
+
+1. Version 1.2
+
+
+---
+
+1. Version 1.2
+
+- Correct comments in gen_esme/gen_smsc (Exported callbacks).
+
+- Do not spawn a process for each request. Replace request brokers (processes) 
+  by request status (static) information.
+
+- gen_esme_session and gen_smsc_session are almost identical.
+
+  Implement a gen_session to hold code common to gen_esme_session and
+  gen_smsc_session
+
+- gen_esme and gen_smsc are almost identical.
+
+  Implement a gen_peer to hold code common to gen_esme and 
+  gen_smsc
+
+- Review timers.

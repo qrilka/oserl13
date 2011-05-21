@@ -1,0 +1,357 @@
+changes.txt - OSERL Version 1.2                              Jun 28, 2005
+
+                    http://sourceforge.net/projects/oserl/
+
+             Enrique Marcote Peña <mpquique@users.sourceforge.net>
+
+
+(Find a HTML version of this document in doc/changes.html)
+
+
+Contents
+
+1.   Changes 0.1 -> 0.2
+1.1  base_syntax.hrl
+1.2  base_syntax.erl
+1.3  param_syntax.hrl
+1.4  param_syntax.erl
+1.5  pdu_syntax.hrl
+1.6  pdu_syntax.erl
+1.7  smpp_globals.hrl
+1.8  smpp_base.hrl
+1.9  smpp_param.hrl
+1.10 smpp_pdu.hrl
+1.11 operation.erl
+1.12 sm.erl
+1.13 gen_connection.erl
+1.14 gen_esme_session.erl
+1.15 gen_esme.erl
+1.16 Sample files (code_lock_esme.erl, echo_esme.erl and submit_esme.erl)
+1.17 Other changes
+
+2.   Changes 0.2 -> 1.0
+2.1  smpp_globals.hrl
+2.2  gen_esme_session.erl
+2.3  operation.erl
+
+3.   Changes 1.0 -> 1.1
+
+4.   Changes 1.1 -> 1.2
+4.1  smpp_base.hrl
+4.2  sm.erl
+4.3  gen_esme_session.erl
+4.4  gen_esme.erl
+4.5  smpp_globals.hrl
+4.6  operation.erl
+4.7  pdu_syntax.erl
+
+---
+
+
+1.   Changes 0.1 -> 0.2
+
+- Default values of standard parameters included in the parameter
+  descriptor (just like in TLVs).  Lists of PDUs default values do no longer
+  exist.
+
+  Refer to smpp_param.hrl in order to change the default value of a parameter.
+- Trailing NULL_CHARACTERs in C-Octet Strings are transparently handled
+  by encoding/decoding functions.  Application layer does not handle 
+  terminating NULLs any more.
+- Absolute and relative time formats are now pure C-Octet Strings (Not 
+  records).  time record removed.  (Refer to base_syntax.erl, 
+  base_syntax.hrl and smpp_base.hrl for further details).
+- gen_esme callback interface redefined.
+- PDU packing/unpacking functions redefined.
+- New macros for composite parameters value definitions.
+
+  For instance, ?DEST_ADDRESS_SME_DEFAULT_VALUE and
+  ?DEST_ADDRESS_SME_VALUE/4 were defined for parameter dest_address_sme.
+
+How these changes affected individual files is described below.
+
+
+1.1  base_syntax.hrl 
+
+- empty base type record definition removed.
+- EMPTY macro now defined as 
+
+    -define(EMPTY, ?UNION([])).
+
+- format field in strings is now a Fun. Much more powerful and elegant than
+  before.
+- HEX_C_OCTET_STRING, DEC_C_OCTET_STRING, HEX_OCTET_STRING and DEC_OCTET_STRING
+  macros redefined using new format feature for strings.
+- ATIME_C_OCTET_STRING and RTIME_C_OCTET_STRING macros defined using new 
+  format feature for strings.
+
+
+1.2  base_syntax.erl
+
+- Trailing NULL_CHARACTER is transparetly handled by base_syntax:encode/2 and
+  base_syntax:decode/2 functions.
+- take_until/3 moved to module binary.erl of the common_lib
+- is_dec/1 and is_hex/1 moved to module my_string.erl of the common_lib.
+- format field in strings is now a Fun. Much more powerful and elegant than
+  before.
+
+  decode/2 and encode/2 changed (simplified :-) accordingly.
+
+
+1.3  param_syntax.hrl 
+
+- Field default added to standard record definition.
+
+  STANDARD macro accordingly updated.
+
+
+1.4  param_syntax.erl 
+
+- encode_std/2 and encode_tlv/2 are now responsible for encoding default 
+  values on standard and mandatory tlvs respectively.
+
+
+1.5  pdu_syntax.hrl
+
+- command_id added to PDU descriptors.
+
+
+1.6  pdu_syntax.erl
+
+- Removed pdu_syntax:get_value/2 and pdu_syntax:set_value/3.  Using dictionary
+  API instead.
+
+  pdu_syntax functions are no longer used beyond operation API.
+- command_id is now included into the PDU descriptor.
+- New functions command_id/1 and sequence_number/1.
+
+
+1.7  smpp_globals.hrl
+
+- $\0 removed from the NULL_C_OCTET_STRING macro.
+
+
+1.8  smpp_base.hrl
+
+- Trailing $\0 removed from the c_octet_string values.
+- Absolute/relative time implemented as pure C-Octet Strings.  Time record 
+  finally removed.  Time manipulation is now much more natural... and easy.
+- New macros for composite parameters value definitions.
+
+  For instance, ?DEST_ADDRESS_SME_DEFAULT_VALUE and
+  ?DEST_ADDRESS_SME_VALUE/4 were defined for parameter dest_address_sme.
+
+
+1.9  smpp_param.hrl
+
+- Default values added to Standard parameters.
+- Default values for TLVs reviewed.
+
+
+1.10 smpp_pdu.hrl
+
+- Default values moved to smpp_param.hrl.
+- Field number_of_messages added to submit_sm, data_sm and submit_multi_sm.
+- CDMA and TDMA specific TLVs are no longer commented out.
+- command_id added to PDU descriptors.
+
+
+1.11 operation.erl
+
+- Implemented get_param/2 and set_param/3, replacements for 
+  pdu_syntax:get_value/2 and pdu_syntax:set_value/3 respectively.
+- new_pdu/5 function removed.  PDU defaults MACROS do no longer exist.
+- pack/1, pack_esme/1, pack_mc/1, unpack/1, unpack_esme/1 and unpack_mc/1 
+  functions redefined.
+
+1.12 sm.erl
+
+- Calls to pdu_syntax:get_value/2 replaced by operation:get_param/2.
+
+
+1.13 gen_connection.erl
+
+- retry_status is disabled on die event.
+- If already listening on Port, the term {error, {already_listening, Port}} is
+  returned for a request to listen on Port (instead of "ok").
+- If already connected to Address on Port, the term 
+  {error, {already_listening, Address, Port}} is returned for a request to 
+  connect to Address on Port (instead of ok).
+- Changes in comments.
+
+
+1.14 gen_esme_session.erl
+
+- Calls to pdu_syntax:get_value/2 replaced by operation:get_param/2.
+- All timers reviewed (fixed).
+- request_broker fixed when Caller is undefined.
+- Changes in comments.
+
+
+1.15 gen_esme.erl
+
+- Calls to pdu_syntax:get_value/2 replaced by operation:get_param/2.
+- Completely redesigned.
+- Callback interface redefined.
+
+
+1.16 Sample files (code_lock_esme.erl, echo_esme.erl and submit_esme.erl)
+
+- Trailing $\0 removed from the c_octet_string values.
+- Absolute/relative time implemented as pure C-Octet Strings.  Time record 
+  finally removed.  Time manipulation is now much more natural... and easy.
+- Last changes in gen_esme.erl adopted.
+- Use new callbacks defined in gen_esme.erl.
+
+1.16 Other changes
+
+- Makefiles were fixed to find compiled behaviors.
+
+
+2.   Changes 0.2 -> 1.0
+
+- Now shipped under the GNU Lesser General Public License.
+- gen_esme.hrl and gen_esme_session.hrl replaced by oserl.hrl
+- gen_smsc and gen_smsc_session behaviors implemented.
+- gen_connection completely redesigned.
+- gen_esme_session and changed to adopt the new design of gen_connection.
+- gen_esme acts now as an extended gen_server. There's no need to implement 
+  several behaviors separately.
+
+How these changes affected individual files is described below.
+
+
+2.1  smpp_globals.hrl
+
+- VALID_COMMAND_ID macro defined.
+- Two new macros added:  REQUEST and RESPONSE.  To compute the counterpart of
+  a command_id.
+- The macro COMMAND_ID gets the command_id (int) for a given command_name 
+  (atom).
+- The macro COMMAND_NAME gets the command_name (atom) for a given command_id 
+  (int).
+
+
+2.2  gen_esme_session.erl
+
+- Internal functions alert_notification/2, bind_receiver_resp/1, 
+  bind_transceiver_resp/1, bind_transmitter_resp/1, deliver_data_sm/2, 
+  deliver_sm/2, enquire_link/2, outbind/2, unbind/2 and unbind_resp/1 removed.
+- handle_input_corrupt_pdu/4 responds to corrupt unbind PDUs with an 
+  unbind_resp (due to a bug, a generic_nack was issued on previous versions.
+
+
+2.3  operation.erl
+
+- pack_mc/1 is now called pack_smsc/1.
+- unpack_mc/1 is now called unpack_smsc/1.
+- new_xxx/2 and new_xxx/3 functions removed.  See generic functions new/3 and 
+  new/4.
+- request_command_id/1 and response_command_id/1 redefined as macros in 
+  smpp_globals.hrl.
+
+
+3.   Changes 1.0 -> 1.1
+
+- gen_connection removed.
+- gen_esme and gen_smsc redesigned.
+- gen_esme_session and gen_smsc_session redesigned.
+
+
+4.   Changes 1.1 -> 1.2
+
+- Removed unused vars warnings.
+- Add some functions for message concatenation support.  Refer to sm module.
+- PDU logs added.  See smpp_log module for further details.
+- Enquire link operation reviewed.
+- SMPP errors description.  Refer to smpp_error module.
+
+See other changes on individual files below.
+
+
+4.1  smpp_base.hrl
+
+- ESM_CLASS_DOMAIN fixed.  Thanks to hfventer for this fix.  
+  The max values were less than the min values! Without this it would be 
+  impossible to send binary content messages (like ring tones or WAP push).
+
+
+4.2  sm.erl
+
+- Functions reply_destination_address/1, reply_source_address/1 and
+  reply_addresses/1 added.
+  reply_address/1 will be removed in future releases, please use 
+  reply_destination_address/1 instead.
+- Functions udhi/1 and udhi/2 added.
+- Function split_user_data/2 implemented.
+- Function chop_udh/1 implemented.
+- Function reference_number/1 implemented.
+- Function join_user_data/1 added.
+- Function total_segments/1 implemented.
+
+
+4.3  gen_esme_session.erl
+
+- New callback  handle_enquire_link_failure/3 added.
+  See http://sourceforge.net/forum/forum.php?thread_id=1206343&forum_id=350015
+- Use proc_lib:spawn_link/1 instead of spawn_link.
+- New function reference_number/1 implemented.
+- PDUs are logged using the new smpp_log event manager.
+- Errors reported using the error_logger.
+- New callback handle_enquire_link/3 added.
+  See http://sourceforge.net/forum/forum.php?thread_id=1206343&forum_id=350015
+- Use built in gen_fsm timers.
+- Timers (finally :-) redefined.
+- Replace request brokers with timers.  Now instead of spawning a
+  process for each request, a timer is set.
+- enquire_link behavior redefined.  No false enquire_link failures permitted.
+
+  Please see discussions on this subject 
+  http://sourceforge.net/forum/forum.php?thread_id=1206343&forum_id=350015
+  and http://smsforum.net/smf/index.php?topic=1980.0
+- Use smpp_error:format/1 in error reports.
+- Show PDUs in hex format in error reports.
+
+
+4.4  gen_esme.erl
+
+- New callback handle_enquire_link_failure/2 added.
+  See http://sourceforge.net/forum/forum.php?thread_id=1206343&forum_id=350015
+- handle_alert_notification/2 must have only 2 parameters and not 3, as 
+  previously declared in behaviour_info/1.
+- Functions session_start_link/2 and session_start_link/3 added.
+- Use proc_lib:spawn_link/1 instead of spawn_link.
+- Functions submit_sm/3 and	submit_multi/3 added.
+- Log utility added.  Functions open_disk_log/1, close_disk_log</a>,
+  open_error_logger/1 and close_error_logger/0 implemented.
+
+  By default neither the disk_log nor the error_logger handler are
+  added to the smpp_log event manager, thus no logging is done until
+  open_disk_log/1 and/or open_error_logger/1 are called.
+
+  Please refer to smpp_log for further information about OSERL logs.
+- Implement gen_esme_session callback handle_enquire_link/3.
+
+  http://sourceforge.net/forum/forum.php?thread_id=1206343&forum_id=350015
+
+4.5  smpp_globals.hrl
+
+- SM_MAX_SIZE and SM_SEGMENT_MAX_SIZE macros defined.
+
+
+4.6  operation.erl
+
+- Use my_lists:ukeymerge/3 in merge_params/2.
+
+
+4.7  pdu_syntax.erl
+
+- Condition CommandId of 16#800000000 removed from guards in functions
+  pack/2 and unpack/2.
+
+  There was one 0 too many on that conditions.
+
+  Now the command_status is assumed to be always 0 on request PDUs.
+- Function command_status/1 added.
+- Small change in unpack_tlvs/2.  Now call unpack_tlvs/3 instead of looping
+  back to unpack_tlvs/2 when discarding unsupported TLVs.

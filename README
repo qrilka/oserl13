@@ -1,0 +1,44 @@
+README - OSERL Version 1.2                                   Apr 11, 2005
+
+                    http://sourceforge.net/projects/oserl/
+
+             Enrique Marcote Peña <mpquique@users.sourceforge.net>
+
+
+Index
+
+1.    Install OSERL
+2.    Developing SMS based applications
+
+
+---
+
+
+1. Install OSERL
+
+Install common_lib package:
+
+  tar -zxvf common_lib-1.0.tar.gz
+  cd common_lib-1.0
+  make
+
+Install oserl package:
+
+  tar -zxvf oserl-1.1.tar.gz
+  cd oserl-1.1
+  make
+
+Put the ebin directory of both packages in your code path.
+
+To compile an erlang program using oserl, don't forget to add a reference to
+the include directory:
+
+   -I <path-to-oserl>/include -pz <path-to-oserl>/ebin
+
+
+
+2.  Developing SMS based applications
+
+Please refer to doc/index.html for detailed information (also available at
+http://oserl.sourceforge.net/oserl/index.html).
+
